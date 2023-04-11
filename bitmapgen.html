@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Drawing Program</title>
+</head>
+<body>
+  <canvas id="canvas" width="320" height="320"></canvas>
+  <script>
+    // Colors
+    const BLACK = '#000000';
+    const WHITE = '#FFFFFF';
+    const RED = '#FF0000';
+    const GREEN = '#00FF00';
+    const BLUE = '#0000FF';
+    const YELLOW = '#FFFF00';
+    const PINK = '#FF00FF';
+    const LIGHT_BLUE = '#00FFFF';
+    const ORANGE = '#FFA500';
+    const DARK_GRAY = '#313131';
+
+    // Set up the canvas
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const cellSize = 20;
+    const canvasSize = 16 * cellSize;
+    const canvasData = Array.from({ length: 16 }, () => Array.from({ length: 16 }, () => BLACK));
+    let drawing = false;
+    let brushColor = BLACK;
+    let lastBrushColor = brushColor;
+
+    // Function to save canvas as txt file
+    function saveCanvas() {
+      let row = '';
+      canvasData.forEach(rowData => {
+        rowData.forEach(color => {
+          if (color === BLACK) row += '0';
+          else if (color === WHITE) row += '1';
+          else if (color === RED) row += '2';
+          else if (color === GREEN) row += '3';
+          else if (color === BLUE) row += '4';
+          else if (color === YELLOW) row += '5';
+          else if (color === PINK) row += '6';
+          else if (color === LIGHT_BLUE) row += '7';
+          else if (color === ORANGE) row += '8';
+          else if (color === DARK_GRAY) row += '9';
+        });
+        row += '-';
+      });
+      // Do something with the row data, e.g. send to server or display in console
+      console.log(row);
+    }
+
+    // Event listener for keydown
+    document.addEventListener('keydown', (event) => {
+      if (!isNaN(parseInt(event.key)) && parseInt(event.key) >= 0 && parseInt(event.key) <= 9) {
+        const colorIndex = parseInt(event.key);
+        switch (colorIndex) {
+          case 0:
+            brushColor = BLACK;
+            break;
+          case 1:
+            brushColor = WHITE;
+            break;
+          case 2:
+            brushColor = RED;
+            break;
+          case 3:
+            brushColor = GREEN;
+            break;
+          case 4:
+            brushColor = BLUE;
+            break;
+          case 5:
+            brushColor = YELLOW;
+            break;
+          case 6:
+            brushColor = PINK;
+            break;
+          case 7:
+            brushColor = LIGHT_BLUE;
+            break;
+          case 8:
+            brushColor = ORANGE;
+            break;
+          case 9:
+            brushColor = DARK_GRAY;
+            break;
+        }
+      } else if (event.key === ' ' || event.key === 'Spacebar') {
+        lastBrushColor = brushColor;
+        brushColor = BLACK;
+        drawing = true;
+      } else if (event.key === 's' || event.key === 'S') {
+        saveCanvas();
+      }
+    });
+
+    // Event listener for keyup
+    document.addEventListener('keyup', (event) => {
+      if (event.key === ' ' || event.key === 'Spacebar') {
+        drawing = false;
+        brushColor = lastBrushColor;
+      }
+    });
+
+    // Event listener for mousemove
+    canvas.addEventListener('mousemove', (event) => {
+      if (drawing) {
+        const x = Math.floor(event.offsetX / cellSize);
+        const y = Math.floor(event.offsetY / cellSize);
+        if (x >= 0 && x < 16 && y >= 0 && y < 16) {
+          canvasData[y][x] = brushColor;
+          drawCell(x, y, brushColor);
+        }
+      }
+    });
+
+    // Function to draw a cell on the canvas
+    function drawCell(x, y, color) {
+      ctx.fillStyle = color;
+      ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+    }
+
+    // Function to initialize the canvas with cells
+    function initCanvas() {
+      for (let y = 0; y < 16; y++) {
+        for (let x = 0; x < 16; x++) {
+          drawCell(x, y, canvasData[y][x]);
+        }
+      }
+    }
+
+    // Initialize the canvas
+    initCanvas();
+  </script>
+</body>
+</html>
